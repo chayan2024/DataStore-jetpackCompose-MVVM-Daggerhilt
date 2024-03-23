@@ -1,46 +1,38 @@
 package com.example.datastore_jetpackcompose_mvvm_daggerhilt
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.datastore_jetpackcompose_mvvm_daggerhilt.ui.theme.DataStorejetpackComposeMVVMDaggerhiltTheme
+import androidx.compose.runtime.*
+import androidx.lifecycle.ViewModelProvider
+import com.example.datastore_jetpackcompose_mvvm_daggerhilt.model.ItemData
+import com.example.datastore_jetpackcompose_mvvm_daggerhilt.viewmodel.ItemViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val viewModel: ItemViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            DataStorejetpackComposeMVVMDaggerhiltTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
-                }
-            }
+            // Observe the StateFlow from the ViewModel
+            val items by remember { viewModel.items }.collectAsState(emptyList())
+
+            // Display the list of items
+            ItemList(items)
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DataStorejetpackComposeMVVMDaggerhiltTheme {
-        Greeting("Android")
+    @Composable
+    fun ItemList(items: List<ItemData>) {
+        LazyColumn {
+            items(items) { item ->
+                Text(text = item.name)
+            }
+        }
     }
 }
